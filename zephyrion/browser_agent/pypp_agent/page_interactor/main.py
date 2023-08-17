@@ -54,6 +54,7 @@ class PageInteractor(JsExecutor):
         :param text: (str) Text to type
         :return:
         """
+
         return await self.input_handler.type_input(selector=selector, text=text)
 
     # scroll related
