@@ -2,9 +2,9 @@ import asynctest
 import pyppeteer.page
 
 from test.test_utils.page_utils import prepare_page
-from zephyrion.browser_agent.pypp_agent.js_util.handler import JsAttrHandler
-from zephyrion.browser_agent.pypp_agent.page_interactor import PageInteractor
-from zephyrion.browser_agent.pypp_agent.browser_manager import SinglePageBrowser
+from zephyrion.browser_agent.pypp.js_util.handler import JsAttrHandler
+from zephyrion.browser_agent.pypp.page_interactor import PageInteractor
+from zephyrion.browser_agent.pypp.browser_manager import SinglePageBrowser
 
 
 class TestJsAttrHandler(asynctest.TestCase):

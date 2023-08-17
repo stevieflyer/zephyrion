@@ -2,10 +2,10 @@ import time
 
 import pyppeteer.page
 
-from zephyrion.browser_agent.pypp_agent.js_util.decorator import execute_js
-from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler, JsExecutor
-from zephyrion.browser_agent.pypp_agent.js_util.js_generator import JsGenerator
-from zephyrion.browser_agent.pypp_agent.js_util.js_handler.data_handler.common import JsQueryHandler
+from zephyrion.browser_agent.pypp.js_util.decorator import execute_js
+from zephyrion.browser_agent.pypp.js_util.interface import JsHandler, JsExecutor
+from zephyrion.browser_agent.pypp.js_util.js_generator import JsGenerator
+from zephyrion.browser_agent.pypp.js_util.js_handler.data_handler.common import JsQueryHandler
 
 
 class ScrollHandler(JsHandler):

@@ -3,9 +3,9 @@ from typing import List, Any
 import pyppeteer.page
 from pyppeteer.element_handle import ElementHandle
 
-from zephyrion.browser_agent.pypp_agent.js_util.js_handler.data_handler.common import JsAttrHandler, JsQueryHandler
+from zephyrion.browser_agent.pypp.js_util.js_handler.data_handler.common import JsAttrHandler, JsQueryHandler
 from zephyrion.utils.debug_utils import Debugger
-from zephyrion.browser_agent.pypp_agent.js_util.interface import JsExecutor
+from zephyrion.browser_agent.pypp.js_util.interface import JsExecutor
 
 
 class DataExtractor(JsExecutor):

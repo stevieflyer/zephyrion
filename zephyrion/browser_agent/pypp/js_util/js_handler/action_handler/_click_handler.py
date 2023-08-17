@@ -1,6 +1,6 @@
-from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler
-from zephyrion.browser_agent.pypp_agent.js_util.js_handler.action_handler.common import JsActionHandler
-from zephyrion.browser_agent.pypp_agent.page_interactor.decorator import wait_for_selector
+from zephyrion.browser_agent.pypp.js_util.interface import JsHandler
+from zephyrion.browser_agent.pypp.js_util.js_handler.action_handler.common import JsActionHandler
+from zephyrion.browser_agent.pypp.page_interactor.decorator import wait_for_selector
 
 
 class ClickHandler(JsHandler):
@@ -16,7 +16,7 @@ class ClickHandler(JsHandler):
         :param new_page: (bool) Whether to wait for a new page to load, if True, an extra wait time will be added
         :param new_page_wait: (float) Extra wait time in milliseconds for new page to load
         """
-        action_handler = JsActionHandler(js_executor=self._js_executor)
+        action_handler = JsActionHandler(js_executor=self._js_executor, page=self._page, debug_tool=self._debug_tool)
         self._debug_tool.info(f"Clicking {selector}...")
 
         await action_handler.click(selector=selector)

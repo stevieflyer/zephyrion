@@ -11,7 +11,7 @@ class PyppeteerAgent:
     """
     Agent class for managing browser instances and page interactions.
     """
-    def __init__(self, headless=True, debug_tool: Debugger = None, interactor_config_path: Union[str, pathlib.Path] = None):
+    def __init__(self, headless=False, debug_tool: Debugger = None, interactor_config_path: Union[str, pathlib.Path] = None):
         """
         :param headless: (bool) Whether to run the browser in headless mode
         :param debug_tool: (Debugger) Debugger instance for debugging
@@ -39,11 +39,13 @@ class PyppeteerAgent:
 
         :return: (None)
         """
+        self._debug_tool.debug(f"Starting PyppeteerAgent...")
         await self.browser_manager.start_browser()
         page = await self.browser_manager.get_page()
         self.page_interactor = PageInteractor(page=page, debug_tool=self._debug_tool, config_path=self.interactor_config_path)
         self.data_extractor = DataExtractor(page=page, debug_tool=self._debug_tool)
         assert self.is_running is True, "Browser is not running successfully"
+        self._debug_tool.debug(f"Starting PyppeteerAgent Successfully")
 
     async def end(self) -> None:
         """

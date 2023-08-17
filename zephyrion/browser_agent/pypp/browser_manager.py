@@ -56,7 +56,7 @@ class SinglePageBrowser:
     and **only one page** is allowed to be used.
     """
 
-    def __init__(self, browser_options=None, headless=True, debug_tool=None):
+    def __init__(self, browser_options=None, headless=True, debug_tool=None, home_page: str = None):
         self._is_running: bool = False
         """whether browser is running"""
         self._browser: pyppeteer.browser.Browser = None

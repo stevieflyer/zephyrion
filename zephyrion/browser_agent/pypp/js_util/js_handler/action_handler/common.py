@@ -5,9 +5,9 @@ Including:
 
 - `JsActionHandler`
 """
-from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler
-from zephyrion.browser_agent.pypp_agent.js_util.decorator import execute_js
-from zephyrion.browser_agent.pypp_agent.js_util.js_generator import JsGenerator
+from zephyrion.browser_agent.pypp.js_util.interface import JsHandler
+from zephyrion.browser_agent.pypp.js_util.decorator import execute_js
+from zephyrion.browser_agent.pypp.js_util.js_generator import JsGenerator
 
 
 class JsActionHandler(JsHandler):

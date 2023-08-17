@@ -1,4 +1,7 @@
+from typing import List
+
 import pyppeteer.page
+import pyppeteer.element_handle
 
 from .config import PageInteractionConfig
 from ..js_util.interface import JsExecutor
@@ -33,6 +36,12 @@ class PageInteractor(JsExecutor):
         self.click_handler = ClickHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
         self.input_handler = InputHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
         self.scroll_handler = ScrollHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
+
+    async def get_element(self, selector: str) -> pyppeteer.element_handle.ElementHandle:
+        return await self._page.querySelector(selector=selector)
+
+    async def get_elements(self, selector: str) -> List[pyppeteer.element_handle.ElementHandle]:
+        return await self._page.querySelectorAll(selector=selector)
 
     # click related
     async def click(self, selector: str, new_page: bool = False):

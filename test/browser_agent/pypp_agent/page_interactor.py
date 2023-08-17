@@ -3,8 +3,8 @@ import logging
 import asynctest
 
 from test.test_utils.page_utils import prepare_page
-from zephyrion.browser_agent.pypp_agent.debugger import Debugger
-from zephyrion.browser_agent.pypp_agent.page_interactor import PageInteractor
+from zephyrion.browser_agent.pypp.debugger import Debugger
+from zephyrion.browser_agent.pypp.page_interactor import PageInteractor
 
 
 class TestPageInteractor(asynctest.TestCase):
