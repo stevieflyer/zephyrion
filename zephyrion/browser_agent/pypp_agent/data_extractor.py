@@ -45,13 +45,32 @@ class DataExtractor(JsExecutor):
         return [await self.get_text(element=element) for element in elements]
 
     async def get_attr(self, element: ElementHandle, attribute: str) -> Any:
+        """
+        Get attribute of given element
+
+        :param element: (ElementHandle) Element to get attribute from
+        :param attribute: (str) Attribute to get
+        :return: (Any) Attribute of given element
+        """
         return await self._page.evaluate(f'(element) => element.getAttribute("{attribute}")', element)
 
     async def get_cls_list(self, element: ElementHandle) -> List[Any]:
+        """
+        Get classList of given element
+        :param element: (ElementHandle) Element to get classList from
+        :return: (list) List of classList
+        """
         cls_dict = await self._page.evaluate('(element) => element.classList', element)
         return list(cls_dict.values())
 
     async def has_cls(self, element: ElementHandle, cls: str) -> bool:
+        """
+        Check if given element has given class
+
+        :param element: (ElementHandle) Element to check
+        :param cls: (str) Class to check
+        :return: (bool) True if element has given class, False otherwise
+        """
         cls_list = await self.get_cls_list(element)
         return cls in cls_list
 
