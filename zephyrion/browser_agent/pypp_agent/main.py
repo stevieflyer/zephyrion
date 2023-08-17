@@ -1,7 +1,7 @@
-from .debugger import Debugger
 from .data_extractor import DataExtractor
 from .browser_manager import SinglePageBrowser
 from .page_interactor import PageInteractor
+from zephyrion.utils.debug_utils import Debugger
 
 
 class PyppeteerAgent:

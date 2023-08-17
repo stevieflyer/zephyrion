@@ -1,9 +1,12 @@
-from .base_handler import BaseHandler
-from zephyrion.browser_agent.pypp_agent.js_util.handler import JsAttrHandler
-from ..decorator import wait_for_selector
+from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler
+from zephyrion.browser_agent.pypp_agent.page_interactor.decorator import wait_for_selector
+from zephyrion.browser_agent.pypp_agent.js_util.js_handler.data_handler.common import JsAttrHandler
 
 
-class InputHandler(BaseHandler):
+class InputHandler(JsHandler):
+    """
+    Handler for inputting text in elements.
+    """
     @wait_for_selector
     async def type_input(self, selector: str, text: str) -> None:
         """

@@ -66,6 +66,9 @@ class Debugger:
     def log(self, msg):
         self._logger.debug(msg)
 
+    def debug(self, msg):
+        self._logger.debug(msg)
+
     def info(self, msg):
         self._logger.info(msg)
 

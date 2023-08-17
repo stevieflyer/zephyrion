@@ -1,9 +1,8 @@
 import pyppeteer.page
 
-from ..debugger import Debugger
+from zephyrion.utils.debug_utils import Debugger
 from .config import PageInteractionConfig
 from ..js_util.interface import JsExecutor
-from .handler import ClickHandler, InputHandler, ScrollHandler
 
 
 class PageInteractor(JsExecutor):
@@ -13,7 +12,14 @@ class PageInteractor(JsExecutor):
     This class is a facade class that provides a high-level interface for interacting with a page.
     """
 
-    def __init__(self, page, config_path=None, debug_tool=None):
+    def __init__(self, page: pyppeteer.page.Page, config_path: str = None, debug_tool: 'Debugger' = None):
+        """
+        Initialize the PageInteractor.
+
+        :param page: Pyppeteer page object.
+        :param config_path: Path to the interaction configuration. Defaults to None.
+        :param debug_tool: Debugging tool. Defaults to Debugger instance.
+        """
         # initialize self
         self._page: pyppeteer.page.Page = page
         assert isinstance(self._page, pyppeteer.page.Page)
@@ -84,7 +90,7 @@ class PageInteractor(JsExecutor):
         """
         return await self.scroll_handler.scroll_by(x_disp=x_disp, y_disp=y_disp)
 
-    async def scroll_load(self, scroll_step: int = None, load_wait: int = 40, same_th: int = 20):
+    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20):
         """
         Scroll and load all contents, until no new content is loaded.
 
@@ -95,7 +101,7 @@ class PageInteractor(JsExecutor):
         """
         return await self.scroll_handler.scroll_load(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
 
-    async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = None,
+    async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
                                    load_wait: int = 40, same_th: int = 20) -> int:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
@@ -112,22 +118,33 @@ class PageInteractor(JsExecutor):
                                                               same_th=same_th)
 
     @property
-    def url(self):
-        """current url of the page"""
+    def url(self) -> str:
+        """Return the current url of the page."""
         return self._page.url
 
     @property
-    def config_path(self):
-        """path to the config file"""
+    def config_path(self) -> str:
+        """Return the path to the config file."""
         return self._config_path
 
     @property
-    def config(self):
-        """config object"""
+    def config(self) -> PageInteractionConfig:
+        """Return the config object."""
         return self._config
 
     async def exec_js(self, js: str):
+        """Execute JavaScript code on the page.
+
+        :param js: JavaScript code string to be executed.
+        :return: Result of the JavaScript execution.
+        """
         return await self._page.evaluate(js)
+
+    def __str__(self):
+        return f"PageInteractor(url={self.url})"
+
+    def __repr__(self):
+        return self.__str__()
 
 
 __all__ = ["PageInteractor"]

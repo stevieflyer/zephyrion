@@ -2,6 +2,7 @@ class JsGenerator:
     """
     A Basic Javascript code generator.
     """
+
     # query related
     @staticmethod
     def get_element(selector: str) -> str:
@@ -69,7 +70,11 @@ class JsGenerator:
 
     @staticmethod
     def get_scroll_top() -> str:
-        return "document.body.scrollTop"
+        return "window.pageYOffset || document.documentElement.scrollTop"
+
+    @staticmethod
+    def get_scroll_left() -> str:
+        return "window.pageXOffset || document.documentElement.scrollLeft"
 
     @staticmethod
     def scroll_to(x: int, y: int):
@@ -86,7 +91,6 @@ class JsGenerator:
     @staticmethod
     def scroll_to_top():
         return "window.scrollTo(0,0);"
-
 
 
 __all__ = ['JsGenerator']

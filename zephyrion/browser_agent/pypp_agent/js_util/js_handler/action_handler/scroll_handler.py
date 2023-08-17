@@ -1,81 +1,82 @@
 import time
 
-from .base_handler import BaseHandler
-from zephyrion.browser_agent.pypp_agent.js_util.handler import JsScrollHandler
+from zephyrion.browser_agent.pypp_agent.js_util.decorator import execute_js
+from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler
+from zephyrion.browser_agent.pypp_agent.js_util.js_generator import JsGenerator
+from zephyrion.browser_agent.pypp_agent.js_util.js_handler.data_handler.common import JsQueryHandler
 
 
-class ScrollHandler(BaseHandler):
+class ScrollHandler(JsHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._js_scroll_handler = JsScrollHandler(js_executor=self._js_executor)
-
-    async def count(self, selector: str) -> int:
-        """
-        Count the number of elements matching the selector.
-
-        :param selector: (str) Selector of the element to count
-        :return: (int) Number of elements matching the selector
-        """
-        elements = await self.query_all(selector)
-        return len(elements)
-
-    async def scroll_to_bottom(self):
-        """
-        Scroll to the bottom of the page.
-        """
-        await self._js_scroll_handler.scroll_to_bottom()
-        self._debug_tool.info('Scrolled to the bottom of the page')
-
-    async def scroll_to_top(self):
-        """
-        Scroll to the top of the page.
-        """
-        await self._js_scroll_handler.scroll_to_top()
-        self._debug_tool.info('Scrolled to the top of the page')
+        self._js_query_handler = JsQueryHandler(js_executor=self._js_executor)
 
     async def scroll_to(self, x: int, y: int):
-        """
-        Scroll to the middle of the page.
-        """
-        await self._js_scroll_handler.scroll_to(x, y)
-        self._debug_tool.info(f'Scrolled to {x} and {y}')
+        return await self._scroll_to(x=x, y=y)
+
+    @execute_js
+    async def _scroll_to(self, x: int, y: int):
+        return JsGenerator.scroll_to(x=x, y=y)
 
     async def scroll_by(self, x_disp: int, y_disp: int):
-        """
-        Scroll by x_disp and y_disp.
-        """
-        await self._js_scroll_handler.scroll_by(x_disp, y_disp)
-        self._debug_tool.info(f'Scrolled by {x_disp} and {y_disp}')
+        return await self._scroll_by(x_disp=x_disp, y_disp=y_disp)
+
+    @execute_js
+    async def _scroll_by(self, x_disp: int, y_disp: int):
+        return JsGenerator.scroll_by(x_disp=x_disp, y_disp=y_disp)
+
+    async def scroll_to_bottom(self):
+        return await self._scroll_to_bottom()
+
+    @execute_js
+    async def _scroll_to_bottom(self):
+        return JsGenerator.scroll_to_bottom()
+
+    async def scroll_to_top(self):
+        return await self._scroll_to_top()
+
+    @execute_js
+    async def _scroll_to_top(self):
+        return JsGenerator.scroll_to_top()
 
     async def get_scroll_height(self):
-        """
-        Get the scroll height of the page.
-        """
-        return await self._js_scroll_handler.get_scroll_height()
+        return await self._get_scroll_height()
+
+    @execute_js
+    async def _get_scroll_height(self):
+        return JsGenerator.get_scroll_height()
 
     async def get_scroll_width(self):
-        """
-        Get the scroll width of the page.
-        """
-        return await self._js_scroll_handler.get_scroll_width()
+        return await self._get_scroll_width()
+
+    @execute_js
+    async def _get_scroll_width(self):
+        return JsGenerator.get_scroll_width()
 
     async def get_scroll_top(self):
-        """
-        Get the scroll width of the page
-        :return:
-        """
-        return await self._js_scroll_handler.get_scroll_top()
+        return await self._get_scroll_top()
+
+    @execute_js
+    async def _get_scroll_top(self):
+        return JsGenerator.get_scroll_top()
+
+    async def get_scroll_left(self):
+        return await self._get_scroll_left()
+
+    @execute_js
+    async def _get_scroll_left(self):
+        return JsGenerator.get_scroll_left()
 
     async def _scroll_step(self, scroll_step: int = None) -> None:
         """
         Scroll by `scroll_step` pixels, if scroll_step is `None`, scroll to bottom.
         """
         if scroll_step is None:
-            await self._js_scroll_handler.scroll_to_bottom()
+            await self.scroll_to_bottom()
         else:
-            await self._js_scroll_handler.scroll_by(0, scroll_step)
+            await self.scroll_by(0, scroll_step)
 
-    async def scroll_load(self, scroll_step: int = None, load_wait: int = 40, same_th: int = 20):
+    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20):
         """
         Scroll and load all contents, until no new content is loaded.
 
@@ -86,7 +87,7 @@ class ScrollHandler(BaseHandler):
         """
         return await self._scroll_load_(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
 
-    async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = None,
+    async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
                                    load_wait: int = 40, same_th: int = 20) -> int:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
@@ -100,7 +101,7 @@ class ScrollHandler(BaseHandler):
         """
         self._debug_tool.info(f'Scrolling and loading {selector}...')
         await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
-        n_elements = await self.count(selector)
+        n_elements = await self._js_query_handler.count(selector=selector)
         self._debug_tool.info(f'Loaded {n_elements} elements')
         return n_elements
 
@@ -126,12 +127,12 @@ class ScrollHandler(BaseHandler):
         self._debug_tool.info(f'Inner Call Scrolling and loading...(selector={selector}, scroll_step={scroll_step}, load_wait={load_wait}, same_th={same_th}, threshold={threshold})')
         while True:
             if selector is not None:
-                count = await self.count(selector)
-                if count >= threshold:
+                count = await self._js_query_handler.count(selector=selector)
+                if threshold is not None and count >= threshold:
                     self._debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
                     break
             await self._scroll_step(scroll_step)
-            time.sleep(load_wait)
+            time.sleep(load_wait / 1000.)
             top = await self.get_scroll_top()
             self._debug_tool.debug(f'Scroll top: {top}, last top: {last_top}')
             if top == last_top:
