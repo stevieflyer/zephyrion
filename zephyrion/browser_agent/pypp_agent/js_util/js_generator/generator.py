@@ -12,6 +12,10 @@ class JsGenerator:
     def get_elements(selector: str) -> str:
         return f'document.querySelectorAll("{selector}")'
 
+    @staticmethod
+    def get_text_content(selector: str) -> str:
+        return f'{JsGenerator.get_element(selector)}.textContent'
+
     # attr related
     @staticmethod
     def get_attr(selector: str, attr: str) -> str:

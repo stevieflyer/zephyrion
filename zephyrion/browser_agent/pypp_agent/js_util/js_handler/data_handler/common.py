@@ -8,6 +8,7 @@ include:
 """
 import json
 
+from typing import List
 import pyppeteer.element_handle
 
 from zephyrion.browser_agent.pypp_agent.js_util.decorator import execute_js
@@ -28,7 +29,7 @@ class JsQueryHandler(JsHandler):
         """
         return await self._page.querySelector(selector)
 
-    async def query_all(self, selector: str) -> list:
+    async def query_all(self, selector: str) -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Get all elements matching the selector.
 
@@ -47,6 +48,24 @@ class JsQueryHandler(JsHandler):
         elements = await self.query_all(selector)
         n_elements = 0 if elements is None else len(elements)
         return n_elements
+
+    @execute_js
+    async def extract_text(self, selector: str) -> str:
+        """
+        Get the text content of the first element matching the selector.
+
+        :param selector: (str) Selector of the element to get
+        :return: (str) Text content of the first element matching the selector
+        """
+        return JsGenerator.get_text_content(selector)
+
+    async def extract_texts(self, selector: str) -> List[str]:
+        """
+        Get the text content of all elements matching the selector.
+
+        :param selector: (str) Selector of the element to get
+        :return:
+        """
 
     @execute_js
     async def has_before_pseudo_elements(self, selector: str) -> str:
@@ -116,27 +135,27 @@ class JsClassHandler(JsHandler):
     """
     Javascript Handler for class list manipulation.
     """
-    async def get_class_list(self, selector):
+    async def get_class_list(self, selector) -> List[str]:
         """
         Get the class list of an element.
 
         :param selector: (str) Selector of the element to get
         :return: (list) List of classes
         """
-        raw_result: dict = await self._get_class_list(selector=selector)
-        return list(raw_result.values())
+        cls_dict: dict = await self._get_class_list(selector=selector)
+        return list(cls_dict.values())
 
     @execute_js
     async def _get_class_list(self, selector: str):
         return JsGenerator.get_class_list(selector=selector)
 
-    async def add_class(self, selector, class_name):
+    async def add_class(self, selector, class_name) -> None:
         """
         Add a class to an element's classList.
 
         :param selector: (str) Selector of the element to add
         :param class_name: (str) Class to add
-        :return:
+        :return: (None)
         """
         return await self._add_class(selector=selector, class_name=class_name)
 
@@ -144,13 +163,13 @@ class JsClassHandler(JsHandler):
     async def _add_class(self, selector: str, class_name: str):
         return JsGenerator.add_class(selector=selector, class_name=class_name)
 
-    async def remove_class(self, selector, class_name):
+    async def remove_class(self, selector, class_name) -> None:
         """
         Remove a class from an element's classList.
 
         :param selector: (str) Selector of the element to remove
         :param class_name: (str) Class to remove
-        :return:
+        :return: (None)
         """
         return await self._remove_class(selector=selector, class_name=class_name)
 
@@ -158,13 +177,13 @@ class JsClassHandler(JsHandler):
     async def _remove_class(self, selector: str, class_name: str):
         return JsGenerator.remove_class(selector=selector, class_name=class_name)
 
-    async def toggle_class(self, selector, class_name):
+    async def toggle_class(self, selector, class_name) -> None:
         """
         Toggle a class on an element's classList.
 
         :param selector: (str) Selector of the element to toggle
         :param class_name: (str) Class to toggle
-        :return:
+        :return: (None)
         """
         return await self._toggle_class(selector=selector, class_name=class_name)
 

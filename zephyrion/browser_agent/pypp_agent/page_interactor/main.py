@@ -1,8 +1,9 @@
 import pyppeteer.page
 
-from zephyrion.utils.debug_utils import Debugger
 from .config import PageInteractionConfig
 from ..js_util.interface import JsExecutor
+from zephyrion.utils.debug_utils import Debugger
+from ..js_util.js_handler.action_handler import ClickHandler, InputHandler, ScrollHandler
 
 
 class PageInteractor(JsExecutor):
@@ -45,7 +46,7 @@ class PageInteractor(JsExecutor):
         :param new_page: (bool) Whether to wait for a new page to load, if True, an extra wait time will be added
         :return:
         """
-        return await self.click_handler.click(selector=selector, new_page=new_page)
+        return await self.click_handler.click(selector=selector, new_page=new_page, new_page_wait=self._config.new_page_wait)
 
     # type related
     async def type_input(self, selector: str, text: str):
