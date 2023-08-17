@@ -15,9 +15,8 @@ class InputHandler(JsHandler):
         Sometimes the typing can fail, so we retry for 3 times at most.
 
         :param selector: (str) Selector of the input element
-        :param page: (pyppeteer.page.Page) Page to type in
         :param text: (str) Text to type
-        :return:
+        :return: (None)
         """
         current_text = ""
         retry_count, max_retry = 0, 3
