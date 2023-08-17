@@ -30,12 +30,9 @@ class PageInteractor(JsExecutor):
         if self._config_path:
             self._config.parse_config(self._config_path)
         # initialize handlers
-        self.click_handler = ClickHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool,
-                                          config=self._config)
-        self.input_handler = InputHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool,
-                                          config=self._config)
-        self.scroll_handler = ScrollHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool,
-                                            config=self._config)
+        self.click_handler = ClickHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
+        self.input_handler = InputHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
+        self.scroll_handler = ScrollHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
 
     # click related
     async def click(self, selector: str, new_page: bool = False):

@@ -1,15 +1,17 @@
 import time
 
+import pyppeteer.page
+
 from zephyrion.browser_agent.pypp_agent.js_util.decorator import execute_js
-from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler
+from zephyrion.browser_agent.pypp_agent.js_util.interface import JsHandler, JsExecutor
 from zephyrion.browser_agent.pypp_agent.js_util.js_generator import JsGenerator
 from zephyrion.browser_agent.pypp_agent.js_util.js_handler.data_handler.common import JsQueryHandler
 
 
 class ScrollHandler(JsHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._js_query_handler = JsQueryHandler(js_executor=self._js_executor)
+    def __init__(self, page: pyppeteer.page.Page, js_executor: JsExecutor, debug_tool=None):
+        super().__init__(page=page, js_executor=js_executor, debug_tool=debug_tool)
+        self._js_query_handler = JsQueryHandler(page=page, js_executor=js_executor, debug_tool=debug_tool)
 
     async def scroll_to(self, x: int, y: int):
         return await self._scroll_to(x=x, y=y)
