@@ -5,7 +5,7 @@ import pyppeteer.element_handle
 
 from .config import PageInteractionConfig
 from ..js_util.interface import JsExecutor
-from zephyrion.utils.debug_utils import Debugger
+from utils.debug_utils import Debugger
 from ..js_util.js_handler.action_handler import ClickHandler, InputHandler, ScrollHandler
 
 
@@ -110,7 +110,7 @@ class PageInteractor(JsExecutor):
         return await self.scroll_handler.scroll_load(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
 
     async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
-                                   load_wait: int = 40, same_th: int = 20) -> int:
+                                   load_wait: int = 40, same_th: int = 20) -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
 

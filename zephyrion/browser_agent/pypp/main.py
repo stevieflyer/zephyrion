@@ -4,7 +4,7 @@ from typing import Union
 from .data_extractor import DataExtractor
 from .page_interactor import PageInteractor
 from .browser_manager import SinglePageBrowser
-from zephyrion.utils.debug_utils import Debugger
+from utils.debug_utils import Debugger
 
 
 class PyppeteerAgent:
@@ -17,9 +17,9 @@ class PyppeteerAgent:
         :param debug_tool: (Debugger) Debugger instance for debugging
         :param interactor_config_path: (str, pathlib.Path) Path to the page interaction config file
         """
-        self._debug_tool = debug_tool if debug_tool is not None else Debugger()
+        self.debug_tool = debug_tool if debug_tool is not None else Debugger()
         self._interactor_config_path = interactor_config_path
-        self.browser_manager = SinglePageBrowser(headless=headless, debug_tool=self._debug_tool)
+        self.browser_manager = SinglePageBrowser(headless=headless, debug_tool=self.debug_tool)
         self.page_interactor: Union[PageInteractor, None] = None
         self.data_extractor: Union[DataExtractor, None] = None
 
@@ -39,15 +39,15 @@ class PyppeteerAgent:
 
         :return: (None)
         """
-        self._debug_tool.debug(f"Starting PyppeteerAgent...")
+        self.debug_tool.debug(f"Starting PyppeteerAgent...")
         await self.browser_manager.start_browser()
         page = await self.browser_manager.get_page()
-        self.page_interactor = PageInteractor(page=page, debug_tool=self._debug_tool, config_path=self.interactor_config_path)
-        self.data_extractor = DataExtractor(page=page, debug_tool=self._debug_tool)
+        self.page_interactor = PageInteractor(page=page, debug_tool=self.debug_tool, config_path=self.interactor_config_path)
+        self.data_extractor = DataExtractor(page=page, debug_tool=self.debug_tool)
         assert self.is_running is True, "Browser is not running successfully"
-        self._debug_tool.debug(f"Starting PyppeteerAgent Successfully")
+        self.debug_tool.debug(f"Starting PyppeteerAgent Successfully")
 
-    async def end(self) -> None:
+    async def stop(self) -> None:
         """
         Close the browser and release the page interactor and data extractor.
 
@@ -63,7 +63,7 @@ class PyppeteerAgent:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.end()
+        await self.stop()
 
 
 __all__ = ["PyppeteerAgent"]

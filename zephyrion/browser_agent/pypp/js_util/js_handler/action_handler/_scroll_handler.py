@@ -1,6 +1,8 @@
 import time
+from typing import List
 
 import pyppeteer.page
+import pyppeteer.element_handle
 
 from zephyrion.browser_agent.pypp.js_util.decorator import execute_js
 from zephyrion.browser_agent.pypp.js_util.interface import JsHandler, JsExecutor
@@ -90,7 +92,7 @@ class ScrollHandler(JsHandler):
         return await self._scroll_load_(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
 
     async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
-                                   load_wait: int = 40, same_th: int = 20) -> int:
+                                   load_wait: int = 40, same_th: int = 20) -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
 
@@ -101,10 +103,10 @@ class ScrollHandler(JsHandler):
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
         :return: (int) The number of elements matching the selector
         """
-        self._debug_tool.info(f'Scrolling and loading {selector}...')
+        self.debug_tool.info(f'Scrolling and loading {selector}...')
         await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
         n_elements = await self._js_query_handler.count(selector=selector)
-        self._debug_tool.info(f'Loaded {n_elements} elements')
+        self.debug_tool.info(f'Loaded {n_elements} elements')
         return n_elements
 
     async def _scroll_load_(self, selector: str = None, scroll_step: int = None, load_wait: int = 40,
@@ -126,20 +128,20 @@ class ScrollHandler(JsHandler):
         """
         same_count = 0
         last_top = None
-        self._debug_tool.info(f'Inner Call Scrolling and loading...(selector={selector}, scroll_step={scroll_step}, load_wait={load_wait}, same_th={same_th}, threshold={threshold})')
+        self.debug_tool.info(f'Inner Call Scrolling and loading...(selector={selector}, scroll_step={scroll_step}, load_wait={load_wait}, same_th={same_th}, threshold={threshold})')
         while True:
             if selector is not None:
                 count = await self._js_query_handler.count(selector=selector)
                 if threshold is not None and count >= threshold:
-                    self._debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
+                    self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
                     break
             await self._scroll_step(scroll_step)
             time.sleep(load_wait / 1000.)
             top = await self.get_scroll_top()
-            self._debug_tool.debug(f'Scroll top: {top}, last top: {last_top}')
+            self.debug_tool.debug(f'Scroll top: {top}, last top: {last_top}')
             if top == last_top:
                 same_count += 1
-                self._debug_tool.info(f'Top unchanged, Scroll top: {top}, last top: {last_top}, same count: {same_count}, same_th: {same_th}')
+                self.debug_tool.info(f'Top unchanged, Scroll top: {top}, last top: {last_top}, same count: {same_count}, same_th: {same_th}')
                 if same_count >= same_th:
                     break
             else:

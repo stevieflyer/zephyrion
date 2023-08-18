@@ -1,7 +1,7 @@
 import abc
 import pyppeteer.page
 
-from zephyrion.utils.debug_utils import Debugger
+from utils.debug_utils import Debugger
 
 
 class JsExecutor(abc.ABC):
@@ -40,7 +40,7 @@ class JsHandler:
         """general javascript code handler"""
         if not isinstance(self._js_executor, JsExecutor):
             raise TypeError(f'js_executor should be an instance of JsExecutor, got {type(js_executor)}')
-        self._debug_tool = debug_tool if debug_tool else Debugger()
+        self.debug_tool = debug_tool if debug_tool else Debugger()
 
     @property
     def js_executor(self):

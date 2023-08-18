@@ -5,7 +5,7 @@ import pyppeteer.page
 import pyppeteer.browser
 from pyppeteer import launch
 
-from zephyrion.utils.debug_utils import Debugger
+from utils.debug_utils import Debugger
 
 
 class BrowserNotRunningError(Exception):

@@ -7,9 +7,9 @@ DEFAULT_LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
 def debug_decorator(action):
     async def wrapper(self, selector, *args, **kwargs):
-        self._debug_tool.info(f'{action}ing {selector}...')
+        self.debug_tool.info(f'{action}ing {selector}...')
         result = await action(self, selector, *args, **kwargs)
-        self._debug_tool.info(f'{selector} {action}ed successfully')
+        self.debug_tool.info(f'{selector} {action}ed successfully')
         return result
     return wrapper
 

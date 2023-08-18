@@ -16,13 +16,13 @@ class ClickHandler(JsHandler):
         :param new_page: (bool) Whether to wait for a new page to load, if True, an extra wait time will be added
         :param new_page_wait: (float) Extra wait time in milliseconds for new page to load
         """
-        action_handler = JsActionHandler(js_executor=self._js_executor, page=self._page, debug_tool=self._debug_tool)
-        self._debug_tool.info(f"Clicking {selector}...")
+        action_handler = JsActionHandler(js_executor=self._js_executor, page=self._page, debug_tool=self.debug_tool)
+        self.debug_tool.info(f"Clicking {selector}...")
 
         await action_handler.click(selector=selector)
-        self._debug_tool.info(f'{selector} clicked successfully')
+        self.debug_tool.info(f'{selector} clicked successfully')
         if new_page:
-            self._debug_tool.info(f'waiting for new page to load...')
+            self.debug_tool.info(f'waiting for new page to load...')
             await self._page.waitFor(new_page_wait)
 
 
