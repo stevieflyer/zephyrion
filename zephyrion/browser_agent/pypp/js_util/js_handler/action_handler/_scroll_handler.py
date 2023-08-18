@@ -107,7 +107,7 @@ class ScrollHandler(JsHandler):
         await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
         n_elements = await self._js_query_handler.count(selector=selector)
         self.debug_tool.info(f'Loaded {n_elements} elements')
-        return n_elements
+        return await self._js_query_handler.query_all(selector=selector)
 
     async def _scroll_load_(self, selector: str = None, scroll_step: int = None, load_wait: int = 40,
                             same_th: int = 20, threshold: int = None) -> None:

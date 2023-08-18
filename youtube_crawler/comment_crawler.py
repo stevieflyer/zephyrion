@@ -1,26 +1,26 @@
 from typing import List
 
-from .data.pojo import VideoInfo
+from .data.pojo import VideoComment
 from .base_crawler import YoutubeBaseCrawler
+from .page_parser.modules import YoutubeUrlParser
 
 
 class YoutubeCommentCrawler(YoutubeBaseCrawler):
     """
     Crawler for video comments on YouTube.
     """
-    async def crawl(self, search_term: str, n_target: int, filter_options: dict) -> List[VideoInfo]:
-        # search for the search term
-        await self._browser_agent.search(search_term=search_term)
-        # filter the search result
-        for filter_section, filter_option in filter_options.items():
-            await self._browser_agent.filter_search_result(filter_category=filter_section, filter_option=filter_option)
+    async def crawl(self, video_url: str, n_target: int = None) -> List[VideoComment]:
+        assert YoutubeUrlParser.is_video_url(video_url) is True, "The url is not a video url."
+
+        await self._browser_agent.browser_manager.go(video_url)
+
         # load the search result
-        video_card_elem_list = await self._browser_agent.scroll_load_video_cards(n_target=n_target)
+        comment_card_list = await self._browser_agent.scroll_load_comments(n_target=n_target)
 
         # Parse and get the video info
-        video_card_list = [await self._page_parser.parse_video_card(video_card_elem) for video_card_elem in video_card_elem_list]
+        comment_list = [await self._page_parser.parse_video_comment(comment_card) for comment_card in comment_card_list]
 
-        return video_card_list
+        return comment_list
 
 
-__all__ = ["YoutubeVideoInfoCrawler"]
+__all__ = ["YoutubeCommentCrawler"]
