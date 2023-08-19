@@ -1,5 +1,5 @@
 import pyppeteer.page
-from zephyrion.browser_agent.pypp.browser_manager import SinglePageBrowser
+from zephyrion.pypp.browser_manager import SinglePageBrowser
 
 
 async def prepare_page(headless=False) -> (pyppeteer.page.Page, SinglePageBrowser):
