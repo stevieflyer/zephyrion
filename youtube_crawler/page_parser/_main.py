@@ -1,8 +1,8 @@
 import pyppeteer.element_handle
 
-from ..dao.pojo import VideoInfo
-from .modules import VideoInfoParser, VideoCommentParser
+from ..dao.pojo import VideoInfo, VideoComment
 from ..browser_agent import YoutubeBrowserAgent
+from .modules import VideoInfoParser, VideoCommentParser
 
 
 class YoutubePageParser:
@@ -25,7 +25,7 @@ class YoutubePageParser:
         """
         return await self._video_info_parser.parse(video_card)
 
-    async def parse_video_comment(self, comment: pyppeteer.element_handle.ElementHandle) -> str:
+    async def parse_video_comment(self, comment: pyppeteer.element_handle.ElementHandle) -> VideoComment:
         """
         Parse the video comment element to get the comment text.
 
