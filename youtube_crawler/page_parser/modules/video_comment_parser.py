@@ -1,8 +1,8 @@
 import pyppeteer.element_handle
 
-from .base_page_parser import BaseParserHandler
-from youtube_crawler.data.pojo import VideoComment
 from .url_parser import YoutubeUrlParser
+from ._base_page_parser import BaseParserHandler
+from youtube_crawler.dao.pojo import VideoComment
 
 
 class VideoCommentParser(BaseParserHandler):

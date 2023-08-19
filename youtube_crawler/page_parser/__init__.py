@@ -1,1 +1,1 @@
-from .main import YoutubePageParser
+from ._main import YoutubePageParser

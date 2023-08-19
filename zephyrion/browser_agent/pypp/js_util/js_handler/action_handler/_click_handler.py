@@ -1,6 +1,6 @@
 from zephyrion.browser_agent.pypp.js_util.interface import JsHandler
 from zephyrion.browser_agent.pypp.js_util.js_handler.action_handler.common import JsActionHandler
-from zephyrion.browser_agent.pypp.page_interactor.decorator import wait_for_selector
+from zephyrion.browser_agent.pypp.page_interactor._decorator import wait_for_selector
 
 
 class ClickHandler(JsHandler):

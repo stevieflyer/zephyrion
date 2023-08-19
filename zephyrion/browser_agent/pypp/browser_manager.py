@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List, Dict
 from functools import wraps
 
 import pyppeteer.page
@@ -88,7 +88,8 @@ class SinglePageBrowser:
         raise NonSingletonError(f"Only one page is allowed to be used, but {len(pages)} pages are found")
 
     async def start_browser(self) -> None:
-        if self._is_running:
+        page = await self.get_page()
+        if page is not None and self._is_running:
             self._debug_tool.warn(f"Browser: Already running.")
         else:
             self._browser = await launch(headless=self._headless, **self._browser_options)
@@ -111,7 +112,7 @@ class SinglePageBrowser:
         return page.url
 
     @ensure_the_page
-    async def get_cookies(self, page: pyppeteer.page.Page) -> dict:
+    async def get_cookies(self, page: pyppeteer.page.Page) -> list[dict[str, Union[str, int, bool]]]:
         return await page.cookies()
 
     @ensure_the_page

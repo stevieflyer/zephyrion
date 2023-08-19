@@ -1,7 +1,7 @@
 from typing import List
 
-from .data.pojo import VideoComment
-from .base_crawler import YoutubeBaseCrawler
+from .dao.pojo import VideoComment
+from ._base_crawler import YoutubeBaseCrawler
 from .page_parser.modules import YoutubeUrlParser
 
 

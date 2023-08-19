@@ -71,3 +71,6 @@ class YoutubeUrlParser:
     @staticmethod
     def is_reply_comment_url(url):
         return YoutubeUrlParser.parse_url(url)["type"] == "reply_comment"
+
+
+__all__ = ['YoutubeUrlParser']

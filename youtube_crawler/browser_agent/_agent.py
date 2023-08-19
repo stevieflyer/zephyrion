@@ -1,11 +1,13 @@
+import time
 from typing import List
 
 import pyppeteer.element_handle
 
-from .filter_enum import FilterSection
 from zephyrion.browser_agent.pypp import PyppeteerAgent
+from youtube_crawler.config.filter_enum import FilterSection
 from youtube_crawler.page_parser.selectors.common import search_input_sel, clear_input_btn_selector, search_submit_sel
 from youtube_crawler.page_parser.selectors.search_result_page import filter_toggle_sel, filter_section_sel, filter_option_sel
+from youtube_crawler.page_parser.modules.url_parser import YoutubeUrlParser
 
 
 class YoutubeBrowserAgent(PyppeteerAgent):
@@ -19,6 +21,7 @@ class YoutubeBrowserAgent(PyppeteerAgent):
     - Open a video and scroll down to load all comments.
     """
     home_page = "https://www.youtube.com/"
+    url_parser = YoutubeUrlParser()
 
     async def start(self) -> None:
         """
@@ -41,15 +44,28 @@ class YoutubeBrowserAgent(PyppeteerAgent):
         """
         Search videos by `search_term`.
 
-        @in_page: any Youtube page
+        @in_page: any YouTube page
 
         @out_page: search result page
 
         :param search_term:  (str) The search term.
         :return: (None)
         """
+        # 1. Type input the search term
         await self._type_input_search_term(search_term=search_term)
-        await self.page_interactor.click(selector=search_submit_sel, new_page=True)
+
+        # 2. Click the search submit button until the search result page is loaded.
+        is_search_page = False
+        n_retry, max_retry = 0, 5
+        while not is_search_page:
+            await self.page_interactor.click(selector=search_submit_sel, new_page=True)
+            current_url: str = await self.browser_manager.get_url()
+            is_search_page = self.url_parser.is_search_url(current_url)
+            n_retry += 1
+        if is_search_page is False:
+            raise RuntimeError(f"Failed to search for {search_term} after {max_retry} retries.")
+        else:
+            self.debug_tool.info(f"Search for {search_term} successfully after {n_retry} retries.")
 
     async def _type_input_search_term(self, search_term: str) -> None:
         """
@@ -59,13 +75,13 @@ class YoutubeBrowserAgent(PyppeteerAgent):
         :return: (None)
         """
         # 1. clear the input
-        await self.page_interactor.click(selector=clear_input_btn_selector)
+        try:
+            await self.page_interactor.click(selector=clear_input_btn_selector)
+        except:
+            pass
 
         # 2. type the input
         await self.page_interactor.type_input(selector=search_input_sel, text=search_term)
-
-        # 3. focus on the input
-        await self.page_interactor.click(selector=search_input_sel)
 
     async def filter_search_result(self, filter_section: FilterSection, filter_option) -> None:
         """

@@ -1,13 +1,17 @@
+from deprecated import deprecated
 from pyppeteer.element_handle import ElementHandle
 
-from youtube_crawler.data.pojo import VideoInfo
-from .base_page_parser import BaseParserHandler
+from .url_parser import YoutubeUrlParser
+from youtube_crawler.dao.pojo import VideoInfo
+from ._base_page_parser import BaseParserHandler
 
 
 class VideoInfoParser(BaseParserHandler):
     """
     Parser Handler for retrieving video info from video card element.
     """
+
+    # noinspection PyTypeChecker
     async def parse(self, video_card: ElementHandle) -> VideoInfo:
         data_dict = {}
 
@@ -24,8 +28,9 @@ class VideoInfoParser(BaseParserHandler):
 
         video_href: str = await (await video_title.getProperty('href')).jsonValue()
         video_href = video_href.strip().split("&pp=")[0]
-        video_id = video_href.split("v=")[-1]
-        data_dict["video_id"] = video_id
+        video_href_info: dict = YoutubeUrlParser.parse_url(video_href)
+        data_dict["video_id"] = video_href_info["video_id"]
+        data_dict["is_short"] = video_href_info["type"] == "short"
         data_dict["video_url"] = video_href
 
         # parse meta
@@ -36,8 +41,7 @@ class VideoInfoParser(BaseParserHandler):
             publish_time = await self.agent.data_extractor.get_text(meta_span_list[1])
             data_dict["publish_time"] = publish_time
         except IndexError:
-            self.agent.debug_tool.warn(f"Could not find publish time for video {video_id}, url: {video_href}")
-        data_dict["is_short"] = await self._is_short_video(video_card)
+            self.agent.debug_tool.warn(f"Could not find publish time for video {data_dict['video_id']}, url: {video_href}")
 
         # parse channel
         channel_thumbnail = await channel_wrapper.querySelector('#channel-thumbnail')
@@ -54,6 +58,7 @@ class VideoInfoParser(BaseParserHandler):
 
         return VideoInfo.from_dict(data_dict)
 
+    @deprecated(reason="This method is deprecated, now the is_short info is inferred by YoutubeUrlParser.")
     async def _is_short_video(self, video_card: ElementHandle) -> bool:
         """
         Check if the video is a short video.

@@ -1,4 +1,4 @@
-from .main import PyppeteerAgent
+from ._main import PyppeteerAgent
 
 
 __all__ = ["PyppeteerAgent"]

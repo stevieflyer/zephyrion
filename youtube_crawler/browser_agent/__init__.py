@@ -1,1 +1,1 @@
-from .agent import YoutubeBrowserAgent
+from ._agent import YoutubeBrowserAgent

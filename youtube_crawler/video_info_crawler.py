@@ -1,7 +1,7 @@
 from typing import List
 
-from .data.pojo import VideoInfo
-from .base_crawler import YoutubeBaseCrawler
+from .dao.pojo import VideoInfo
+from ._base_crawler import YoutubeBaseCrawler
 
 
 class YoutubeVideoInfoCrawler(YoutubeBaseCrawler):
@@ -10,12 +10,13 @@ class YoutubeVideoInfoCrawler(YoutubeBaseCrawler):
 
     This crawler crawls the video infos from YouTube search result page.
     """
-    async def crawl(self, search_term: str, n_target: int, filter_options: dict) -> List[VideoInfo]:
+    async def crawl(self, search_term: str, n_target: int, filter_options: dict = None) -> List[VideoInfo]:
         # search for the search term
         await self._browser_agent.search(search_term=search_term)
         # filter the search result
-        for filter_section, filter_option in filter_options.items():
-            await self._browser_agent.filter_search_result(filter_section=filter_section, filter_option=filter_option)
+        if filter_options is not None:
+            for filter_section, filter_option in filter_options.items():
+                await self._browser_agent.filter_search_result(filter_section=filter_section, filter_option=filter_option)
         # load the search result
         video_card_elem_list = await self._browser_agent.scroll_load_video_cards(n_target=n_target)
         # Parse and get the video info
