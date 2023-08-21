@@ -1,5 +1,6 @@
 import time
-from typing import List
+import asyncio
+from typing import List, Callable
 
 import pyppeteer.page
 import pyppeteer.element_handle
@@ -80,19 +81,21 @@ class ScrollHandler(JsHandler):
         else:
             await self.scroll_by(0, scroll_step)
 
-    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20):
+    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20, scroll_step_callback: Callable = None):
         """
         Scroll and load all contents, until no new content is loaded.
 
         :param scroll_step: (int) The number of pixels to scroll each time. If None, scroll to bottom.
         :param load_wait: (int) The time to wait after each scroll, in milliseconds. If none, the method will wait for 100 ms
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
+        :param scroll_step_callback: (Callable) A callback function to be called after each scroll.
         :return:
         """
-        return await self._scroll_load_(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
+        return await self._scroll_load_(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th, scroll_step_callback=scroll_step_callback)
 
     async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
-                                   load_wait: int = 40, same_th: int = 20) -> List[pyppeteer.element_handle.ElementHandle]:
+                                   load_wait: int = 40, same_th: int = 20, scroll_step_callback: Callable = None) \
+            -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
 
@@ -101,16 +104,18 @@ class ScrollHandler(JsHandler):
         :param load_wait: (int) The time to wait after each scroll, in milliseconds. If none, the method will wait for 100 ms
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
+        :param scroll_step_callback: (Callable) A callback function to be called after each scroll.
         :return: (int) The number of elements matching the selector
         """
         self.debug_tool.info(f'Scrolling and loading {selector}...')
-        await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
+        await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait,
+                                 same_th=same_th, scroll_step_callback=scroll_step_callback)
         n_elements = await self._js_query_handler.count(selector=selector)
         self.debug_tool.info(f'Loaded {n_elements} elements')
         return await self._js_query_handler.query_all(selector=selector)
 
     async def _scroll_load_(self, selector: str = None, scroll_step: int = None, load_wait: int = 40,
-                            same_th: int = 20, threshold: int = None) -> None:
+                            same_th: int = 20, threshold: int = None, scroll_step_callback: Callable = None) -> None:
         """
         Scroll and load all contents.
 
@@ -136,6 +141,11 @@ class ScrollHandler(JsHandler):
                     self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
                     break
             await self._scroll_step(scroll_step)
+            if scroll_step_callback is not None:
+                if asyncio.iscoroutinefunction(scroll_step_callback):
+                    await scroll_step_callback()
+                else:
+                    scroll_step_callback()
             time.sleep(load_wait / 1000.)
             top = await self.get_scroll_top()
             self.debug_tool.debug(f'Scroll top: {top}, last top: {last_top}')
