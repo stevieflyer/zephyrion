@@ -9,7 +9,7 @@ def read_requirements():
 
 setup(
     name='zephyrion',
-    version='0.1.1',
+    version='0.1.2',
     packages=find_packages(exclude=['test', 'test.*']),
     install_requires=read_requirements(),
     url='https://github.com/stevieflyer/zephyrion',
