@@ -151,8 +151,7 @@ class ScrollHandler(JsHandler):
             self.debug_tool.debug(f'Scroll top: {top}, last top: {last_top}')
             if top == last_top:
                 same_count += 1
-                if same_count % 10 == 0:
-                    self.debug_tool.info(f'Top unchanged, Scroll top: {top}, last top: {last_top}, same count: {same_count}, same_th: {same_th}')
+                self.debug_tool.info(f'Top unchanged, Scroll top: {top}, last top: {last_top}, same count: {same_count}, same_th: {same_th}')
                 if same_count >= same_th:
                     break
             else:
