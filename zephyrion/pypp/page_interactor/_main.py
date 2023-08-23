@@ -37,6 +37,15 @@ class PageInteractor(JsExecutor):
         self.input_handler = InputHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
         self.scroll_handler = ScrollHandler(page=self._page, js_executor=self, debug_tool=self._debug_tool)
 
+    async def set_viewport(self, width: int, height: int):
+        """
+        Set the viewport of the page.
+
+        :param width: (int) Width of the viewport
+        :param height: (int) Height of the viewport
+        """
+        await self._page.setViewport({'width': width, 'height': height})
+
     async def get_element(self, selector: str) -> pyppeteer.element_handle.ElementHandle:
         return await self._page.querySelector(selector=selector)
 
