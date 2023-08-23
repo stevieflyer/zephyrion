@@ -94,7 +94,8 @@ class ScrollHandler(JsHandler):
         return await self._scroll_load_(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th, scroll_step_callbacks=scroll_step_callbacks)
 
     async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
-                                   load_wait: int = 40, same_th: int = 20, scroll_step_callbacks: List[Callable] = None) \
+                                   load_wait: int = 40, same_th: int = 20, scroll_step_callbacks: List[Callable] = None,
+                                   log_interval: int = 100) \
             -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
@@ -105,17 +106,19 @@ class ScrollHandler(JsHandler):
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
         :param scroll_step_callbacks: (Callable) A callback function to be called after each scroll.
+        :param log_interval: (int) The interval of logging the number of loaded elements.
         :return: (int) The number of elements matching the selector
         """
         self.debug_tool.info(f'Scrolling and loading {selector}...')
         await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait,
-                                 same_th=same_th, scroll_step_callbacks=scroll_step_callbacks)
+                                 same_th=same_th, scroll_step_callbacks=scroll_step_callbacks, log_interval=log_interval)
         n_elements = await self._js_query_handler.count(selector=selector)
         self.debug_tool.info(f'Loaded {n_elements} elements')
         return await self._js_query_handler.query_all(selector=selector)
 
     async def _scroll_load_(self, selector: str = None, scroll_step: int = None, load_wait: int = 40,
-                            same_th: int = 20, threshold: int = None, scroll_step_callbacks: List[Callable] = None) -> None:
+                            same_th: int = 20, threshold: int = None, scroll_step_callbacks: List[Callable] = None,
+                            log_interval: int = 100) -> None:
         """
         Scroll and load all contents.
 
@@ -129,17 +132,26 @@ class ScrollHandler(JsHandler):
         :param load_wait: (int) The time to wait after each scroll, in milliseconds. If none, the method will wait for 100 ms
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
+        :param scroll_step_callbacks: (List[Callable]) A callback function to be called after each scroll.
+        :log_interval: (int) The interval of logging the number of loaded elements.
         :return: (None)
         """
         same_count = 0
         last_top = None
         self.debug_tool.info(f'Inner Call Scrolling and loading...(selector={selector}, scroll_step={scroll_step}, load_wait={load_wait}, same_th={same_th}, threshold={threshold})')
+        count, prev_count = 0, 0
+
         while True:
             if selector is not None:
                 count = await self._js_query_handler.count(selector=selector)
-                if threshold is not None and count >= threshold:
-                    self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
-                    break
+                if threshold is not None:
+                    if count >= threshold:
+                        self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
+                        break
+                    else:
+                        if count - prev_count >= log_interval:
+                            self.debug_tool.info(f'Loaded {count} elements(sel: {selector}), threshold: {threshold}.')
+                            prev_count = count
             await self._scroll_step(scroll_step)
             if scroll_step_callbacks is not None and len(scroll_step_callbacks) > 0:
                 for scroll_step_cb in scroll_step_callbacks:

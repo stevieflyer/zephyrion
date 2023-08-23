@@ -123,7 +123,8 @@ class PageInteractor(JsExecutor):
                                                      scroll_step_callbacks=scroll_step_callbacks)
 
     async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
-                                   load_wait: int = 40, same_th: int = 20, scroll_step_callbacks: List[Callable] = None) \
+                                   load_wait: int = 40, same_th: int = 20, scroll_step_callbacks: List[Callable] = None,
+                                   log_interval: int = 100) \
             -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
@@ -134,11 +135,13 @@ class PageInteractor(JsExecutor):
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
         :param scroll_step_callbacks: (List[Callable]) A callback function that will be called after each scroll.
+        :param log_interval: (int) The interval of logging the number of elements loaded.
         :return: (int) The number of elements matching the selector
         """
         return await self.scroll_handler.scroll_load_selector(selector=selector, threshold=threshold,
                                                               scroll_step=scroll_step, load_wait=load_wait,
-                                                              same_th=same_th, scroll_step_callbacks=scroll_step_callbacks)
+                                                              same_th=same_th, scroll_step_callbacks=scroll_step_callbacks,
+                                                              log_interval=log_interval)
 
     @property
     def url(self) -> str:
