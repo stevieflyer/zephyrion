@@ -118,19 +118,21 @@ class PyppeteerAgent:
         """
         return await self.page_interactor.scroll_by(x_disp=x_disp, y_disp=y_disp)
 
-    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20):
+    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20, scroll_step_callbacks: List[callable] = None):
         """
         Scroll and load all contents, until no new content is loaded.
 
         :param scroll_step: (int) The number of pixels to scroll each time. If None, scroll to bottom.
         :param load_wait: (int) The time to wait after each scroll, in milliseconds. If none, the method will wait for 100 ms
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
+        :param scroll_step_callbacks: (List[Callable]) A callback function that will be called after each scroll.
         :return:
         """
-        return await self.page_interactor.scroll_load(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th)
+        return await self.page_interactor.scroll_load(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th,
+                                                      scroll_step_callbacks=scroll_step_callbacks)
 
-    async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400,
-                                   load_wait: int = 40, same_th: int = 20) -> List[pyppeteer.element_handle.ElementHandle]:
+    async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400, load_wait: int = 40,
+                                   same_th: int = 20, scroll_step_callbacks: List[callable] = None) -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
 
@@ -139,10 +141,11 @@ class PyppeteerAgent:
         :param load_wait: (int) The time to wait after each scroll, in milliseconds. If none, the method will wait for 100 ms
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
+        :param scroll_step_callbacks: (List[Callable]) A callback function that will be called after each scroll.
         :return: (int) The number of elements matching the selector
         """
         return await self.page_interactor.scroll_load_selector(selector=selector, threshold=threshold, scroll_step=scroll_step,
-                                                               load_wait=load_wait, same_th=same_th)
+                                                               load_wait=load_wait, same_th=same_th, scroll_step_callbacks=scroll_step_callbacks)
 
     # Browser interactions
     async def go_back(self):
