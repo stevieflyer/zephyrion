@@ -144,7 +144,7 @@ class ScrollHandler(JsHandler):
         while True:
             if selector is not None:
                 count = await self._js_query_handler.count(selector=selector)
-                if threshold is not None:
+                if threshold is not None or selector is not None:
                     if count >= threshold:
                         self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
                         break
