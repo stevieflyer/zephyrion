@@ -112,13 +112,14 @@ class ScrollHandler(JsHandler):
         self.debug_tool.info(f'Scrolling and loading {selector}...')
         await self._scroll_load_(selector=selector, threshold=threshold, scroll_step=scroll_step, load_wait=load_wait,
                                  same_th=same_th, scroll_step_callbacks=scroll_step_callbacks, log_interval=log_interval)
-        n_elements = await self._js_query_handler.count(selector=selector)
+        elements = await self._js_query_handler.query_all(selector=selector)
+        n_elements = len(elements)
         self.debug_tool.info(f'Loaded {n_elements} elements')
-        return await self._js_query_handler.query_all(selector=selector)
+        return elements
 
     async def _scroll_load_(self, selector: str = None, scroll_step: int = None, load_wait: int = 40,
                             same_th: int = 20, threshold: int = None, scroll_step_callbacks: List[Callable] = None,
-                            log_interval: int = 100) -> None:
+                            log_interval: int = 100, count_check_interval: int = 5) -> None:
         """
         Scroll and load all contents.
 
@@ -133,45 +134,51 @@ class ScrollHandler(JsHandler):
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
         :param scroll_step_callbacks: (List[Callable]) A callback function to be called after each scroll.
-        :log_interval: (int) The interval of logging the number of loaded elements.
+        :param log_interval: (int) The interval of logging the number of loaded elements.
+        :param count_check_interval: (int) The interval of checking the number of loaded elements.
         :return: (None)
         """
         same_count = 0
         last_top = None
-        self.debug_tool.info(f'Inner Call Scrolling and loading...(selector={selector}, scroll_step={scroll_step}, load_wait={load_wait}, same_th={same_th}, threshold={threshold})')
-        count, prev_count = 0, 0
+        count_check_counter = 0  # New counter for count_check_interval
+        self.debug_tool.info(f'Starting scrolling and loading...')
 
-        finished = False
-        while not finished:
+        count, prev_count = 0, 0
+        while True:
             if selector is not None:
-                count = await self._js_query_handler.count(selector=selector)
-                if threshold is not None and count >= threshold:
-                    self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
-                    finished = True
-                    break
-                else:
-                    if count - prev_count >= log_interval:
-                        self.debug_tool.info(f'Loaded {count} elements(sel: {selector}), threshold: {threshold}.')
+                # Increment counter
+                count_check_counter += 1
+
+                if count_check_counter >= count_check_interval:
+                    count = await self._js_query_handler.count(selector=selector)
+                    count_check_counter = 0  # Reset counter
+                    if threshold is not None and count >= threshold:
+                        self.debug_tool.info(f'Loaded {count} elements, reached threshold {threshold}, stopping.')
+                        break  # Break out of the loop when the threshold is reached
+                    elif count - prev_count >= log_interval:
+                        self.debug_tool.info(f'Loaded {count} elements so far, threshold: {threshold}.')
                         prev_count = count
-            if finished:
-                break
+
             await self._scroll_step(scroll_step)
-            if scroll_step_callbacks is not None and len(scroll_step_callbacks) > 0:
-                for scroll_step_cb in scroll_step_callbacks:
-                    if asyncio.iscoroutinefunction(scroll_step_cb):
-                        await scroll_step_cb()
+
+            if scroll_step_callbacks:
+                for callback in scroll_step_callbacks:
+                    if asyncio.iscoroutinefunction(callback):
+                        await callback()
                     else:
-                        scroll_step_cb()
-            time.sleep(load_wait / 1000.)
+                        callback()
+
+            await asyncio.sleep(load_wait / 1000.)  # Use asyncio.sleep instead of time.sleep
+
             top = await self.get_scroll_top()
-            self.debug_tool.debug(f'Scroll top: {top}, last top: {last_top}')
             if top == last_top:
                 same_count += 1
-                self.debug_tool.info(f'Top unchanged, Scroll top: {top}, last top: {last_top}, same count: {same_count}, same_th: {same_th}')
                 if same_count >= same_th:
-                    break
+                    self.debug_tool.info(f'Top unchanged for {same_count} times, stopping.')
+                    break  # Break out of the loop when the same threshold is reached
             else:
                 same_count = 0
+
             last_top = top
 
 
