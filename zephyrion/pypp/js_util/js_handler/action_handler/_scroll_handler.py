@@ -141,17 +141,20 @@ class ScrollHandler(JsHandler):
         self.debug_tool.info(f'Inner Call Scrolling and loading...(selector={selector}, scroll_step={scroll_step}, load_wait={load_wait}, same_th={same_th}, threshold={threshold})')
         count, prev_count = 0, 0
 
-        while True:
+        finished = False
+        while not finished:
             if selector is not None:
                 count = await self._js_query_handler.count(selector=selector)
-                if threshold is not None or selector is not None:
-                    if count >= threshold:
-                        self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
-                        break
-                    else:
-                        if count - prev_count >= log_interval:
-                            self.debug_tool.info(f'Loaded {count} elements(sel: {selector}), threshold: {threshold}.')
-                            prev_count = count
+                if threshold is not None and count >= threshold:
+                    self.debug_tool.info(f'Loaded {count} elements(exceed threshold {threshold}), stop scrolling')
+                    finished = True
+                    break
+                else:
+                    if count - prev_count >= log_interval:
+                        self.debug_tool.info(f'Loaded {count} elements(sel: {selector}), threshold: {threshold}.')
+                        prev_count = count
+            if finished:
+                break
             await self._scroll_step(scroll_step)
             if scroll_step_callbacks is not None and len(scroll_step_callbacks) > 0:
                 for scroll_step_cb in scroll_step_callbacks:
