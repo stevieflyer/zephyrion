@@ -87,38 +87,45 @@ class PyppeteerAgent:
         """
         return await self.page_interactor.type_input(selector=selector, text=text)
 
-    async def scroll_to_bottom(self):
+    async def scroll_to_bottom(self, element: pyppeteer.element_handle.ElementHandle = None):
         """
         Scroll to the bottom of the page.
-        """
-        return await self.page_interactor.scroll_to_bottom()
 
-    async def scroll_to_top(self):
+        :param element: (ElementHandle) The element to scroll. If None, the method will scroll the page.
+        """
+        return await self.page_interactor.scroll_to_bottom(element=element)
+
+    async def scroll_to_top(self, element: pyppeteer.element_handle.ElementHandle = None):
         """
         Scroll to the top of the page.
-        """
-        return await self.page_interactor.scroll_to_top()
 
-    async def scroll_to(self, x: int, y: int):
+        :param element: (ElementHandle) The element to scroll. If None, the method will scroll the page.
+        """
+        return await self.page_interactor.scroll_to_top(element=element)
+
+    async def scroll_to(self, x: int, y: int, element: pyppeteer.element_handle.ElementHandle = None):
         """
         Scroll to a specific position of the page.
 
         :param x: (int) x coordinate
         :param y: (int) y coordinate
+        :param element: (ElementHandle) The element to scroll. If None, the method will scroll the page.
         """
-        return await self.page_interactor.scroll_to(x=x, y=y)
+        return await self.page_interactor.scroll_to(x=x, y=y, element=element)
 
-    async def scroll_by(self, x_disp: int, y_disp: int):
+    async def scroll_by(self, x_disp: int, y_disp: int, element: pyppeteer.element_handle.ElementHandle = None):
         """
         Scroll by a specific displacement.
 
         :param x_disp: (int) x displacement
         :param y_disp:  (int) y displacement
+        :param element: (ElementHandle) The element to scroll. If None, the method will scroll the page.
         :return:
         """
-        return await self.page_interactor.scroll_by(x_disp=x_disp, y_disp=y_disp)
+        return await self.page_interactor.scroll_by(x_disp=x_disp, y_disp=y_disp, element=element)
 
-    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20, scroll_step_callbacks: List[callable] = None):
+    async def scroll_load(self, scroll_step: int = 400, load_wait: int = 40, same_th: int = 20,
+                          scroll_step_callbacks: List[callable] = None, element: pyppeteer.element_handle.ElementHandle = None):
         """
         Scroll and load all contents, until no new content is loaded.
 
@@ -126,13 +133,15 @@ class PyppeteerAgent:
         :param load_wait: (int) The time to wait after each scroll, in milliseconds. If none, the method will wait for 100 ms
         :param same_th: (int) The threshold of the number of same scroll top to stop scrolling.
         :param scroll_step_callbacks: (List[Callable]) A callback function that will be called after each scroll.
+        :param element: (ElementHandle) The element to scroll. If None, the method will scroll the page.
         :return:
         """
         return await self.page_interactor.scroll_load(scroll_step=scroll_step, load_wait=load_wait, same_th=same_th,
-                                                      scroll_step_callbacks=scroll_step_callbacks)
+                                                      scroll_step_callbacks=scroll_step_callbacks, element=element)
 
     async def scroll_load_selector(self, selector: str, threshold: int = None, scroll_step: int = 400, load_wait: int = 40,
-                                   same_th: int = 20, scroll_step_callbacks: List[callable] = None, log_interval: int = 100) -> List[pyppeteer.element_handle.ElementHandle]:
+                                   same_th: int = 20, scroll_step_callbacks: List[callable] = None, log_interval: int = 100,
+                                   element: pyppeteer.element_handle.ElementHandle = None) -> List[pyppeteer.element_handle.ElementHandle]:
         """
         Scroll and load all contents, until no new content is loaded or enough specific items are collected.
 
@@ -143,11 +152,12 @@ class PyppeteerAgent:
         :param threshold: (int) only valid when `selector` is not `None`, after loading `threshold` number of elements, the method will stop scrolling
         :param scroll_step_callbacks: (List[Callable]) A callback function that will be called after each scroll.
         :param log_interval: (int) The interval of logging the number of elements loaded
+        :param element: (ElementHandle) The element to scroll. If None, the method will scroll the page
         :return: (int) The number of elements matching the selector
         """
         return await self.page_interactor.scroll_load_selector(selector=selector, threshold=threshold, scroll_step=scroll_step,
                                                                load_wait=load_wait, same_th=same_th, scroll_step_callbacks=scroll_step_callbacks,
-                                                               log_interval=log_interval)
+                                                               log_interval=log_interval, element=element)
 
     # Browser interactions
     async def go_back(self):

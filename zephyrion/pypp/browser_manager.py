@@ -6,30 +6,7 @@ import pyppeteer.browser
 from pyppeteer import launch
 from gembox.debug_utils import Debugger
 
-
-class BrowserNotRunningError(Exception):
-    def __init__(self, message=f"Browser is not running"):
-        super().__init__(message)
-
-
-class NoActivePageError(Exception):
-    def __init__(self, message=f"No active page found"):
-        super().__init__(message)
-
-
-class NonSingletonError(Exception):
-    def __init__(self, message=f"Only one browser instance and one page is allowed"):
-        super().__init__(message)
-
-
-def ensure_browser_is_running(func):
-    @wraps(func)
-    async def wrapper(browser_mgr, *args, **kwargs):
-        if browser_mgr.is_running is False:
-            raise BrowserNotRunningError()
-        return await func(browser_mgr, *args, **kwargs)
-
-    return wrapper
+from .._common.browser_manager import NoActivePageError, NonSingletonError
 
 
 def ensure_the_page(func):
